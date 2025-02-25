@@ -1,0 +1,12 @@
+@inherits RazorSlice<NavigationViewModel>
+<div class="pt-6 pb-20">
+	<div class="font-bold">Elastic Docs</div>
+	<ul class="block">
+		@await RenderPartialAsync(_TocTreeNav.Create(new NavigationTreeItem
+		{
+			Level = Model.Tree.Depth,
+			SubTree = Model.Tree,
+			CurrentDocument = Model.CurrentDocument
+		}))
+	</ul>
+</div>

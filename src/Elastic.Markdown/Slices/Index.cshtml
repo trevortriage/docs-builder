@@ -1,0 +1,27 @@
+@using Markdig
+@inherits RazorSliceHttpResult<IndexViewModel>
+@implements IUsesLayout<Elastic.Markdown.Slices._Layout, LayoutViewModel>
+@functions {
+	public LayoutViewModel LayoutModel => new()
+	{
+		Title = $"Elastic Documentation: {Model.Title}",
+		PageTocItems = Model.PageTocItems.Where(i => i is { Level: 2 or 3 }).ToList(),
+		Tree = Model.Tree,
+		CurrentDocument = Model.CurrentDocument,
+		Previous = Model.PreviousDocument,
+		Next = Model.NextDocument,
+		NavigationHtml = Model.NavigationHtml,
+		UrlPathPrefix = Model.UrlPathPrefix,
+		GithubEditUrl = Model.GithubEditUrl,
+		AllowIndexing = Model.AllowIndexing,
+	};
+}
+<section id="elastic-docs-v3">
+	@* This way it's correctly rendered as <h1>text</h1> instead of <h1><p>text</p></h1> *@
+	@(new HtmlString(Markdown.ToHtml("# " + Model.TitleRaw)))
+	@if (Model.Applies is not null)
+	{
+		await RenderPartialAsync(ApplicableTo.Create(Model.Applies));
+	}
+	@(new HtmlString(Model.MarkdownHtml))
+</section>

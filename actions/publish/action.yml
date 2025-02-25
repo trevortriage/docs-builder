@@ -1,0 +1,61 @@
+name: 'Documentation Publisher'
+description: 'Builds and publishes documentation to github pages'
+
+branding:
+  icon: 'filter'
+  color: 'red'
+
+outputs:
+  page_url:
+    description: "The github actions url"
+    value: ${{steps.deployment.outputs.page_url}}
+
+inputs:
+  strict:
+    description: 'Treat warnings as errors'
+    required: false
+  continue-on-error:
+    description: 'Do not fail to publish if build fails'
+    required: false
+    default: "false"
+  private:
+    description: 'Publishing from a private repository'
+    required: false
+    default: "false"
+
+runs:
+  using: "composite"
+  steps:
+    - id: repo-basename
+      if: ${{ inputs.private == 'false' }}
+      shell: bash
+      run: 'echo "value=`basename ${{ github.repository }}`" >> $GITHUB_OUTPUT'
+
+    - name: Build public documentation
+      if: ${{ inputs.private == 'false' }}
+      uses: elastic/docs-builder@main
+      continue-on-error: ${{ inputs.continue-on-error == 'true' }}
+      with:
+        prefix: '${{ steps.repo-basename.outputs.value }}'
+        strict: ${{ inputs.strict }}
+
+    - name: Build private documentation
+      if: ${{ inputs.private != 'false' }}
+      uses: elastic/docs-builder@main
+      continue-on-error: ${{ inputs.continue-on-error == 'true' }}
+      with:
+        strict: ${{ inputs.strict }}
+
+    - name: Setup Pages
+      id: pages
+      uses: actions/configure-pages@v5.0.0
+    - name: List Documentation
+      shell: bash
+      run: 'ls .artifacts/docs/html'
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3.0.1
+      with:
+        path: .artifacts/docs/html
+    - name: Deploy artifact
+      id: deployment
+      uses: actions/deploy-pages@v4.0.5

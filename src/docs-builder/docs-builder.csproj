@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>docs-builder</AssemblyName>
+    <RootNamespace>Documentation.Builder</RootNamespace>
+    <InvariantGlobalization>true</InvariantGlobalization>
+
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <EnableRequestDelegateGenerator>true</EnableRequestDelegateGenerator>
+    <InterceptorsPreviewNamespaces>$(InterceptorsPreviewNamespaces);Microsoft.AspNetCore.Http.Generated</InterceptorsPreviewNamespaces>
+
+    <IsPublishable>true</IsPublishable>
+    <PublishAot>true</PublishAot>
+    <PublishTrimmed>true</PublishTrimmed>
+    <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ConsoleAppFramework.Abstractions" Version="5.4.1" />
+    <PackageReference Include="ConsoleAppFramework" Version="5.4.1" PrivateAssets="all">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Westwind.AspNetCore.LiveReload" Version="0.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Elastic.Documentation.Tooling\Elastic.Documentation.Tooling.csproj" />
+    <ProjectReference Include="..\Elastic.Markdown.Refactor\Elastic.Markdown.Refactor.csproj" />
+    <ProjectReference Include="..\Elastic.Markdown\Elastic.Markdown.csproj" />
+  </ItemGroup>
+</Project>

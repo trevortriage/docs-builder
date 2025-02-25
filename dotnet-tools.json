@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "minver-cli": {
+      "version": "5.0.0",
+      "commands": [
+        "minver"
+      ],
+      "rollForward": false
+    },
+    "dotnet-project-licenses": {
+      "version": "2.7.1",
+      "commands": [
+        "dotnet-project-licenses"
+      ],
+      "rollForward": false
+    },
+    "thirdlicense": {
+      "version": "1.3.1",
+      "commands": [
+        "thirdlicense"
+      ],
+      "rollForward": false
+    },
+    "release-notes": {
+      "version": "0.6.0",
+      "commands": [
+        "release-notes"
+      ],
+      "rollForward": false
+    }
+  }
+}
