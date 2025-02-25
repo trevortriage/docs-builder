@@ -1,0 +1,46 @@
+name: Comment on PR for .asciidoc changes
+
+on:
+  workflow_call: ~
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  comment-on-asciidoc-change:
+    runs-on: ubuntu-latest
+
+    steps:
+        # Without a checkout action, the tj-actions/changes-files action
+        # will use the GitHub API to to determine the diff.
+        # This way we can avoid checking ot the forked PR and
+        # minimize the risk of using `pull_request_target` together
+        # with `actions/checkout`.
+        # Refs:
+        #  - https://securitylab.github.com/resources/github-actions-preventing-pwn-requests/
+        #  - https://github.com/tj-actions/changed-files?tab=readme-ov-file#using-githubs-api-octocat
+      - name: Get changed files
+        id: check-files
+        uses: tj-actions/changed-files@d6e91a2266cdb9d62096cebf1e8546899c6aa18f # v45.0.6
+        with:
+          files: |
+            **/*.asciidoc
+
+      - name: Add a comment if .asciidoc files changed
+        if: steps.check-files.outputs.any_changed == 'true'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: '> [!WARNING]\n> It looks like this PR modifies one or more `.asciidoc` files. These files are being migrated to Markdown, and any changes merged now will be lost. See the [migration guide](https://elastic.github.io/docs-builder/migration/freeze/index.html) for details.'
+            })
+
+      - name: Error if .asciidoc files changed
+        if: steps.check-files.outputs.any_changed == 'true'
+        run: |
+          echo '::error::It looks like this PR modifies one or more .asciidoc files. These files are being migrated to Markdown, and any changes merged now will be lost. See the https://elastic.github.io/docs-builder/migration/freeze/index.html for details.'
+          exit 1

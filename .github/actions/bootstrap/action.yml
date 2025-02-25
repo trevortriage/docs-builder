@@ -1,0 +1,40 @@
+---
+name: Bootstrap Checkout
+description: Ensures all actions bootstrap the same
+
+outputs:
+  full-version:
+    description: "The current agent version number"
+    value: ${{ steps.dotnet.outputs.full-version }}
+  major-version:
+    description: "The current major version number, semver"
+    value: ${{ steps.dotnet.outputs.major-version }}
+    
+runs:
+  using: "composite"
+  steps:
+    # Ensure we fetch all tags
+    - shell: bash
+      run: |
+        git fetch --prune --unshallow --tags
+        git tag --list
+    - uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: global.json
+        
+    - id: dotnet
+      shell: bash
+      run: |
+        dotnet tool restore
+        REPO_VERSION=$(dotnet minver -t=v -p=canary.0 -v=e -m=0.1)
+        echo "Version Number: ${REPO_VERSION}"
+        echo "REPO_VERSION=${REPO_VERSION}" >> $GITHUB_ENV
+        echo "full-version=${REPO_VERSION}" >> $GITHUB_OUTPUT
+        echo "major-version=$(echo ${REPO_VERSION} | cut -d"." -f1)" >> $GITHUB_OUTPUT
+        
+    - uses: actions/setup-node@v4
+      with:
+        cache: npm
+        cache-dependency-path: src/Elastic.Markdown/package-lock.json
+        node-version-file: .nvmrc
+      
